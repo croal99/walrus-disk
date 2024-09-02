@@ -26,6 +26,6 @@ export async function getSetting() {
     }
 }
 
-function setSettings(items) {
+export function setSettings(items) {
     return localforage.setItem(KEY_SETTING, items);
 }

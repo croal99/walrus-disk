@@ -16,6 +16,7 @@ import '@radix-ui/themes/styles.css';
 import "@/styles/globals.css";
 
 import {apiAuthProvider} from "@/hooks/useAuthStatus.ts";
+import Setting, {loader as settingLoader, action as saveSettingAction} from "@/components/home/setting.tsx";
 
 console.log(import.meta.env);
 
@@ -38,6 +39,12 @@ const router = createBrowserRouter([
                     element: <Explorer/>,
                     loader: explorerLoader,
                     action: createAction,
+                },
+                {
+                    path: "setting",
+                    Component: Setting,
+                    loader: settingLoader,
+                    action: saveSettingAction,
                 },
             ],
         },

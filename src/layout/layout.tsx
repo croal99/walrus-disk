@@ -6,7 +6,7 @@ import {getSetting} from "@/hooks/useLocalStore.ts";
 
 export async function loader() {
     const setting = await getSetting();
-    console.log('setting', setting);
+    // console.log('setting', setting);
     const user = await apiAuthProvider.getUser();
     if (!user) {
         return redirect('/login');
@@ -36,10 +36,10 @@ export default function Layout() {
                     <Box height="200px">
                         <nav>
                             <ul>
-                                <li><Link to="/folder/0">所有文件</Link></li>
-                                <li><Link to="/">视频</Link></li>
-                                <li><Link to="/">图片</Link></li>
-                                <li><Link to="/">文档</Link></li>
+                                <li><Link to="/folder/0">All files</Link></li>
+                                <li><Link to="/">Video</Link></li>
+                                <li><Link to="/">Picture</Link></li>
+                                <li><Link to="/">Document</Link></li>
                             </ul>
                         </nav>
                     </Box>
@@ -47,6 +47,7 @@ export default function Layout() {
                         <ul>
                             <li><Link to="/">home</Link></li>
                             <li><Link to="/error">error</Link></li>
+                            <li><Link to="/setting">setting</Link></li>
                             <li><Link to="/logout">sign out</Link></li>
                         </ul>
                     </nav>
