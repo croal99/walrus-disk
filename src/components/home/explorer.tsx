@@ -154,7 +154,7 @@ export default function Explorer() {
                             <Card>
                                 <Flex gap="3">
                                     <Inset clip="padding-box" side="left" pb="current">
-                                        <img src="/png.png" alt="" style={{height: '190px'}}/>
+                                        <img src={`/public/${item.icon}`} alt="" style={{height: '190px'}}/>
                                     </Inset>
                                     <Flex direction="column" gap="3">
                                         <Text><Strong>name: </Strong>{item.name}</Text>

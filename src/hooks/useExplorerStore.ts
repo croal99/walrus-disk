@@ -126,14 +126,28 @@ export async function checkFileIsExist(newFile: FileOnStore) {
 }
 
 export async function createFile(newFile: FileOnStore) {
+    const iconType = ["png", "text/plain"];
+    const iconFile = ["image.png", "txt.png"];
+
     // 检查是否已经创建
     if (await checkFileIsExist(newFile)) {
         return false;
     }
 
-    console.log('create file')
+    console.log('create file', newFile.mediaType)
     newFile.id = Math.random().toString(36).substring(2, 12);
     newFile.createAt = Date.now();
+
+    // icon
+    newFile.icon = "default.png";
+    for (const key in iconType) {
+        if (newFile.mediaType.indexOf(iconType[key]) != -1) {
+            console.log('find', key, iconType[key]);
+            newFile.icon = iconFile[key];
+            break;
+        }
+    }
+
     const files = await getAllFiles();
     files.unshift(newFile);
     await setFiles(files);

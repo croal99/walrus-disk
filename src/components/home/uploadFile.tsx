@@ -118,8 +118,9 @@ export default function UploadFile(
                 parentId: root.id,
                 blobId: blobId,
                 mediaType: file.type,
+                icon: "",
                 size: file.size,
-                createAt: 0
+                createAt: 0,
             }
 
             console.log('new file', fileInfo);
