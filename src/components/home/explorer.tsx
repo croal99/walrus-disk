@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Form, Link, useLoaderData} from "react-router-dom";
-import {Box, Button, Card, Flex, Text, Dialog, TextField, Progress} from "@radix-ui/themes";
+import {Box, Button, Card, Flex, Text, Dialog, TextField, Progress, Inset, Strong} from "@radix-ui/themes";
 import {
     checkFolderIsExist,
     createFile,
@@ -15,6 +15,9 @@ import dayjs from "dayjs";
 import type {FolderOnStore} from "@/types/FolderOnStore.ts";
 import type {FileOnStore} from "@/types/FileOnStore.ts";
 import type {BlobOnWalrus, NewBlobOnWalrus} from "@/types/BlobOnWalrus.ts";
+import {getSetting} from "@/hooks/useLocalStore.ts";
+import Detail from "@/components/home/detail.tsx";
+import {humanFileSize} from "@/utils/formatSize.ts";
 
 export async function loader({params}) {
     // console.log('get folder', params)
@@ -36,57 +39,13 @@ function readfile(file) {
 }
 
 export async function action({request, params}) {
-    console.log('create folder action', params)
+    // console.log('create folder action', params)
     const formData = await request.formData();
-    // console.log('form data', formData, Object.fromEntries(formData))
-    // const blobfile = Object.fromEntries(formData);
-    //
-    // var plaintextbytes = await readfile(blobfile.blobfile)
-    //     .catch(function (err) {
-    //         console.error(err);
-    //     });
-
-
     const newFolder = Object.fromEntries(formData) as FolderOnStore;
     await createFolder(newFolder);
 
     return {}
 }
-
-function BlobToImage({blob}) {
-    const [imageUrl, setImageUrl] = useState('');
-
-    const blobToDataURL = (blob) => {
-        console.log('blobToDataURL', typeof blob)
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                resolve(reader.result);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    };
-
-    useEffect(() => {
-        const convertBlobToImage = async () => {
-            // if (typeof blob != Blob) {
-            //     return;
-            // }
-            try {
-                const dataUrl = await blobToDataURL(blob);
-                setImageUrl(dataUrl);
-            } catch (error) {
-                console.error('Error converting Blob to DataURL:', error);
-            }
-        };
-
-        convertBlobToImage();
-    }, [blob]);
-
-    return <img src={imageUrl} alt="Image" style={{maxWidth: 320}}/>;
-}
-
 
 export default function Explorer() {
     const [file, setFile] = useState();
@@ -94,8 +53,11 @@ export default function Explorer() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [fileList, setFileList] = useState<FileOnStore[]>([]);
     const [isPreview, setIsPreview] = useState(false);
-    const [mediaType, setMediaType] = useState("image/png");
+    const [isDownload, setIsDownload] = useState(false);
     const [mediaData, setMediaData] = useState("");
+
+
+    const [mediaType, setMediaType] = useState("image/png");
     const [mediaUrl, setMediaUrl] = useState<Blob>();
 
     const {root, childs} = useLoaderData();
@@ -117,21 +79,72 @@ export default function Explorer() {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        const url = 'http://localhost:3000/uploadFile';
-        const formData = new FormData();
-        console.log('file', file, file.type);
-        formData.append('file', file);
-        formData.append('fileName', file.name);
+        const setting = await getSetting();
 
-        console.log('file data', formData);
+
+        console.log('file', file, file.type);
         const blob = await readfile(file).catch(function (err) {
             console.error(err);
         });
 
         const plaintextbytes = new Uint8Array(blob);
-        // console.log('read', plaintextbytes)
+        console.log('Uint8Array', plaintextbytes)
 
-        const publisherUrl = "https://publisher-devnet.walrus.space/v1/store?epochs=1";
+        const pbkdf2iterations = 10000;
+        const passphrasebytes = new TextEncoder("utf-8").encode(setting.walrusHash);
+        const pbkdf2salt = window.crypto.getRandomValues(new Uint8Array(8));
+
+        const passphrasekey = await window.crypto.subtle.importKey('raw', passphrasebytes, {name: 'PBKDF2'}, false, ['deriveBits'])
+            .catch(function (err) {
+                console.error(err);
+            });
+        console.log('passphrasekey imported', passphrasebytes);
+
+        let pbkdf2bytes = await window.crypto.subtle.deriveBits({
+            "name": 'PBKDF2',
+            "salt": pbkdf2salt,
+            "iterations": pbkdf2iterations,
+            "hash": 'SHA-256'
+        }, passphrasekey as CryptoKey, 384)
+            .catch(function (err) {
+                console.error(err);
+            });
+        console.log('pbkdf2bytes derived');
+        pbkdf2bytes = new Uint8Array(pbkdf2bytes);
+
+        let keybytes = pbkdf2bytes.slice(0, 32);
+        let ivbytes = pbkdf2bytes.slice(32);
+
+        const key = await window.crypto.subtle.importKey('raw', keybytes, {
+            name: 'AES-CBC',
+            length: 256
+        }, false, ['encrypt'])
+            .catch(function (err) {
+                console.error(err);
+            });
+        console.log('key imported');
+
+        var cipherbytes = await window.crypto.subtle.encrypt({
+            name: "AES-CBC",
+            iv: ivbytes
+        }, key as CryptoKey, plaintextbytes)
+            .catch(function (err) {
+                console.error(err);
+            });
+
+        console.log('plaintext encrypted');
+        cipherbytes = new Uint8Array(cipherbytes);
+
+        const resultbytes = new Uint8Array(cipherbytes.length + 16);
+        resultbytes.set(new TextEncoder("utf-8").encode('Salted__'));
+        resultbytes.set(pbkdf2salt, 8);
+        resultbytes.set(cipherbytes, 16);
+        console.log('resultbytes', resultbytes);
+
+        // return {}
+
+
+        const publisherUrl = `${setting.publisher}/v1/store?epochs=1`;
         const config = {
             headers: {
                 'content-type': 'multipart/form-data',
@@ -143,13 +156,14 @@ export default function Explorer() {
         };
 
         axios.put(publisherUrl, plaintextbytes, config).then(response => {
+            // axios.put(publisherUrl, resultbytes, config).then(response => {
             console.log('store', response)
             setUploadProgress(0);
             let blobId: string;
             if (response.data.alreadyCertified) {
                 blobId = (response.data.alreadyCertified as BlobOnWalrus).blobId
             } else if (response.data.newlyCreated) {
-                blobId = (response.data.alreadyCertified as NewBlobOnWalrus).blobObject.blobId
+                blobId = (response.data.newlyCreated as NewBlobOnWalrus).blobObject.blobId
             }
 
             const fileInfo: FileOnStore = {
@@ -157,7 +171,8 @@ export default function Explorer() {
                 name: file.name,
                 parentId: root.id,
                 blobId: blobId,
-                mediaType: "",
+                mediaType: file.type,
+                size: file.size,
                 createAt: 0
             }
 
@@ -170,13 +185,26 @@ export default function Explorer() {
         })
     }
 
-    const handlePreview = (fileInfo: FileOnStore) => {
+    const handlePreview = async (fileInfo: FileOnStore) => {
         console.log('preview', fileInfo);
-        const txUrl = `https://aggregator-devnet.walrus.space/v1/` + fileInfo.blobId;
-        // setMediaData(txUrl);
+        const setting = await getSetting();
+
+        const txUrl = `${setting.aggregator}/v1/${fileInfo.blobId}`;
         axios.get(txUrl, {responseType: "blob"}).then((res) => {
             console.log('get', res)
             setIsPreview(true);
+            setMediaData(res.data)
+        })
+    }
+
+    const handleDownload = async (fileInfo: FileOnStore) => {
+        console.log('download', fileInfo);
+        const setting = await getSetting();
+
+        const txUrl = `${setting.aggregator}/v1/${fileInfo.blobId}`;
+        axios.get(txUrl, {responseType: "blob"}).then((res) => {
+            console.log('get', res)
+            setIsDownload(true);
             setMediaData(res.data)
         })
     }
@@ -270,14 +298,24 @@ export default function Explorer() {
                             </Dialog.Trigger>
 
                             <Dialog.Content maxWidth="450px">
-                                <Dialog.Title>Upload file</Dialog.Title>
+                                <Dialog.Title>Select file to upload</Dialog.Title>
                                 <Dialog.Description size="2" mb="4">
-                                    Select file to upload
-                                    To encrypt a file, enter a password and drop the file to be encrypted into
-                                    the dropzone
-                                    below. The file will then be encrypted using the password, then you'll be
-                                    given an
-                                    opportunity to save the encrypted file to your system. </Dialog.Description>
+                                    <Text>
+                                        This page uses javascript running within your web browser to encrypt and decrypt
+                                        files client-side, in-browser. This page makes no network connections during
+                                        this
+                                        process, to ensure that your files and keys never leave the web browser during
+                                        the
+                                        process.
+                                    </Text>
+                                    <Text>
+                                        All client-side cryptography is implemented using the Web Crypto API. Files
+                                        are encrypted using AES-CBC 256-bit symmetric encryption. The encryption key is
+                                        derived from the password and a random salt using PBKDF2 derivation with 10000
+                                        iterations of SHA256 hashing.
+
+                                    </Text>
+                                </Dialog.Description>
 
                                 <Box>
                                     <Form onSubmit={handleSubmit}>
@@ -323,45 +361,47 @@ export default function Explorer() {
 
                 </Box>
 
-                <Flex px="3" gap="3">
+                <Flex px="3" py="3" gap="3">
                     {childs.map((item, index) => (
                         <Card key={index}>
                             <Link to={"/folder/" + item.id}><Text>{item.name}</Text></Link>
                         </Card>
                     ))}
                     {fileList.map((item, index) => (
-                        <Card key={index}>
-                            <Flex direction="column" gap="3">
-                                <Link to={"/folder/" + item.id}><Text>{item.name}</Text></Link>
-                                <Text>{item.blobId}</Text>
-                                <Text>{dayjs(item.createAt).format('YYYY/MM/DD')}</Text>
-                                <Button onClick={() => handlePreview(item)}>Preview</Button>
+                        <Box key={index}>
+                            <Card>
+                                <Flex gap="3">
+                                    <Inset clip="padding-box" side="left" pb="current">
+                                        <img
+                                            src="/png.png"
+                                            alt=""
+                                            style={{
+                                                // display: 'block',
+                                                // objectFit: 'cover',
+                                                // width: '100%',
+                                                height: '190px',
+                                            }}
+                                        />
+                                    </Inset>
+                                    <Flex direction="column" gap="3">
+                                        <Text><Strong>name: </Strong>{item.name}</Text>
+                                        <Text><Strong>type: </Strong>{item.mediaType}</Text>
+                                        <Text><Strong>size: </Strong>{humanFileSize(item.size)}</Text>
+                                        <Text><Strong>create at: </Strong>{dayjs(item.createAt).format('YYYY/MM/DD')}</Text>
+                                        <Detail
+                                            walrusFile={item}
+                                            />
+                                    </Flex>
 
+                                </Flex>
 
+                            </Card>
 
-                            </Flex>
-                        </Card>
+                        </Box>
+
                     ))}
                 </Flex>
                 <Box>
-
-                    <Dialog.Root open={isPreview}>
-
-                        <Dialog.Content maxWidth="450px">
-                            <Dialog.Title>Preview</Dialog.Title>
-                            <Dialog.Description size="2" mb="4">
-                                Preview file
-                            </Dialog.Description>
-
-                            <BlobToImage blob={mediaData}/>
-                            <Flex direction="column" gap="3">
-                                <Dialog.Close>
-                                    <Button onClick={()=>setIsPreview(false)}>Close</Button>
-                                </Dialog.Close>
-                            </Flex>
-
-                        </Dialog.Content>
-                    </Dialog.Root>
 
                 </Box>
             </Box>

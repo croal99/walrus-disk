@@ -3,6 +3,7 @@ export interface FileOnStore {
     name: string;
     blobId: string;
     mediaType: string;
+    size: number;
     parentId: string;
     createAt: number;
 }

@@ -4,4 +4,5 @@ export interface SettingOnStore {
     salt: string;
     aggregator: string,
     publisher: string,
+    walrusHash: string,       // walrus加密key
 }
