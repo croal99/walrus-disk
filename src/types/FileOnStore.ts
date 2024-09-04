@@ -6,5 +6,7 @@ export interface FileOnStore {
     icon: string;
     size: number;
     parentId: string;
+    password: string;
+    salt: string;
     createAt: number;
 }

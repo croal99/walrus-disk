@@ -1,4 +1,4 @@
-import {Box, Button, Dialog, Flex, Progress, Spinner, Text} from "@radix-ui/themes";
+import {Blockquote, Box, Button, Card, Dialog, Flex, Progress, Spinner, Strong, Text} from "@radix-ui/themes";
 import {Form} from "react-router-dom";
 import React, {useState} from "react";
 import {getSetting} from "@/hooks/useLocalStore.ts";
@@ -16,9 +16,11 @@ export default function UploadFile(
         reFetchDir,
     }) {
     const [file, setFile] = useState();
+    const [step, setStep] = useState(0);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [openToast, setOpenToast] = React.useState(false);
     const [isError, setIsError] = React.useState(false);
+    const [isWarning, setIsWarning] = React.useState(false);
     const [message, setMessage] = React.useState("");
 
     const readfile = (file) => {
@@ -34,10 +36,10 @@ export default function UploadFile(
     const handleSubmit = async (event) => {
         event.preventDefault()
         const setting = await getSetting();
-        // setMessage("error");
-        // setIsError(true);
-        // return
 
+        setUploadProgress(0);
+        setIsWarning(setting.publisher === "https://publisher-devnet.walrus.space");
+        setStep(2);
 
         const blob = await readfile(file).catch(function (err) {
             console.error(err);
@@ -48,7 +50,7 @@ export default function UploadFile(
 
         const pbkdf2iterations = 10000;
         const passphrasebytes = new TextEncoder("utf-8").encode(setting.walrusHash);
-        const pbkdf2salt = window.crypto.getRandomValues(new Uint8Array(8));
+        const pbkdf2salt = new TextEncoder("utf-8").encode(setting.walrusSalt);
 
         const passphrasekey = await window.crypto.subtle.importKey('raw', passphrasebytes, {name: 'PBKDF2'}, false, ['deriveBits'])
             .catch(function (err) {
@@ -103,17 +105,24 @@ export default function UploadFile(
             }
         };
 
-        axios.put(publisherUrl, plaintextbytes, config).then(response => {
-            // axios.put(publisherUrl, resultbytes, config).then(response => {
+        // axios.put(publisherUrl, plaintextbytes, config).then(response => {
+        axios.put(publisherUrl, resultbytes, config).then(response => {
             console.log('store', response)
             setUploadProgress(0);
             let blobId: string;
+
             if (response.data.alreadyCertified) {
                 blobId = (response.data.alreadyCertified as BlobOnWalrus).blobId
                 setMessage("This file has already been uploaded")
             } else if (response.data.newlyCreated) {
                 blobId = (response.data.newlyCreated as NewBlobOnWalrus).blobObject.blobId
                 setMessage("Walrus file created successfully")
+            } else {
+                setUploadProgress(0);
+                setStep(0);
+                setMessage("Walrus's response is error.");
+                setIsError(true);
+                return;
             }
 
             const fileInfo: FileOnStore = {
@@ -125,15 +134,20 @@ export default function UploadFile(
                 icon: "",
                 size: file.size,
                 createAt: 0,
+                password: setting.walrusHash,
+                salt: setting.walrusSalt,
             }
 
-            console.log('new file', fileInfo);
+            // console.log('new file', fileInfo);
             createFile(fileInfo).then(() => {
                 reFetchDir()
+                setStep(0);
                 setOpenToast(true)
             })
         }).catch(error => {
             console.log('store error', error)
+            setUploadProgress(0);
+            setStep(0);
             setMessage('Please check your network configuration and make sure the Walrus service address is correct.');
             setIsError(true)
         })
@@ -151,17 +165,17 @@ export default function UploadFile(
                 </Dialog.Trigger>
 
                 <Dialog.Content maxWidth="650px">
-                    <Dialog.Title>Select file to upload</Dialog.Title>
+                    <Dialog.Title>Step 1: ENCRYPT file</Dialog.Title>
                     <Dialog.Description size="2" mb="4">
                     </Dialog.Description>
 
                     <Form onSubmit={handleSubmit}>
                         <Flex direction="column" gap="3">
                             <Text>
-                                This App uses javascript running within your web browser to encrypt and decrypt
+                                Walrus Disk uses javascript running within your web browser to encrypt and decrypt
                                 files client-side, in-browser. This App makes no network connections during
                                 this
-                                process, to ensure that your files and keys never leave the web browser during
+                                process, to ensure that your keys never leave the web browser during
                                 the
                                 process.
                             </Text>
@@ -184,25 +198,42 @@ export default function UploadFile(
                                 </Button>
                             </Dialog.Close>
                             <Dialog.Close>
-                                <Button type="submit">Upload</Button>
+                                <Button type="submit">ENCRYPT</Button>
                             </Dialog.Close>
                         </Flex>
                     </Form>
                 </Dialog.Content>
             </Dialog.Root>
 
-            <Dialog.Root open={uploadProgress > 0}>
-                <Dialog.Content maxWidth="450px">
-                    <Dialog.Title>Upload file to Walrus</Dialog.Title>
+            <Dialog.Root open={step == 2}>
+                <Dialog.Content maxWidth="550px">
+                    <Dialog.Title>Step 2: Upload encrypted files to Walrus Disk</Dialog.Title>
                     <Dialog.Description size="2" mb="4">
-                        Walrus supports operations to store and read blobs, and to prove and verify their availability.
-                        It ensures content survives storage nodes suffering Byzantine faults and remains available and
-                        retrievable. It provides APIs to access the stored content over a CLI, SDKs and over web2 HTTP
-                        technologies, and supports content delivery infrastructures like caches and content distribution
-                        networks (CDNs).
                     </Dialog.Description>
 
                     <Flex direction="column" gap="3">
+                        {isWarning ?
+                            <Card>
+                                <Flex direction="column" gap="3">
+                                    <Text>
+                                        The Walrus system provides an interface that can be used for public testing. For
+                                        your
+                                        convenience, walrus provide these at the following hosts:
+                                    </Text>
+                                    <Text>
+                                        <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
+                                    </Text>
+                                    <Text>
+                                        <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
+                                    </Text>
+                                    <Text color="red">
+                                        Walrus publisher is currently limiting requests to <Strong>10 MiB</Strong>. If
+                                        you want
+                                        to upload larger
+                                        files, you need to run your own publisher.
+                                    </Text>
+                                </Flex>
+                            </Card> : null}
                         {uploadProgress < 100 ?
                             <Progress value={uploadProgress} size="3"></Progress> :
                             <Button>

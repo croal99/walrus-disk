@@ -85,7 +85,7 @@ export async function createFile(newFile: FileOnStore) {
         return false;
     }
 
-    console.log('create file', newFile.mediaType)
+    // console.log('create file', newFile.mediaType)
     newFile.id = Math.random().toString(36).substring(2, 12);
     newFile.createAt = Date.now();
 

@@ -2,6 +2,7 @@ import {Blockquote, Box, Button, Card, Container, Flex, Grid, Heading, Strong, T
 import {Form, redirect, useLoaderData} from "react-router-dom";
 import {getSetting, setSettings} from "@/hooks/useLocalStore.ts";
 import {SettingOnStore} from "@/types/SettingOnStore.ts";
+import React from "react";
 
 export async function loader() {
     return await getSetting();
@@ -9,7 +10,6 @@ export async function loader() {
 
 export async function action({request, params}) {
     const formData = await request.formData();
-    console.log('form data', formData)
     const {aggregator, publisher} = Object.fromEntries(formData);
     const setting: SettingOnStore = await getSetting();
     setting.publisher = publisher;
@@ -20,79 +20,97 @@ export async function action({request, params}) {
 }
 
 export default function Setting() {
+    const [isModify, setIsModify] = React.useState(false);
+
     const setting = useLoaderData() as SettingOnStore;
-    // console.log('setting', setting)
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        console.log('setting', setting);
+        await setSettings(setting);
+        setIsModify(false);
+    }
 
     return (
         <>
-            <Form method="post">
-                <Flex gap="3" px="4" py="4" direction="column" width="650px">
-                    <Heading>Setting</Heading>
-                    <Card>
-                        <Blockquote size="2">
-                            <Flex direction="column" gap="3">
-                                <Text>
-                                    The Walrus system provides an interface that can be used for public testing. For your
-                                    convenience, walrus provide these at the following hosts:
-                                </Text>
-                                <Text>
-                                    <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
-                                </Text>
-                                <Text>
-                                    <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
-                                </Text>
-                                <Text>
-                                    Walrus publisher is currently limiting requests to <Strong>10 MiB</Strong>. If you want to upload larger
-                                    files, you need to run your own publisher.
-                                </Text>
+            <Flex gap="3" px="4" py="4" direction="column" width="650px">
+                <Heading>Setting</Heading>
+                <Card>
+                    <Blockquote size="2">
+                        <Flex direction="column" gap="3">
+                            <Text>
+                                The Walrus system provides an interface that can be used for public testing. For your
+                                convenience, walrus provide these at the following hosts:
+                            </Text>
+                            <Text>
+                                <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
+                            </Text>
+                            <Text>
+                                <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
+                            </Text>
+                            <Text>
+                                Walrus publisher is currently limiting requests to <Strong>10 MiB</Strong>. If you want
+                                to upload larger
+                                files, you need to run your own publisher.
+                            </Text>
 
-                                <Text color="red">
-                                    Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet
-                                    deployment would likely not be able to provide uncontrolled public access to publishing
-                                    without requiring some authentication and compensation for the Sui used.
-                                </Text>
+                            <Text color="red">
+                                Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet
+                                deployment would likely not be able to provide uncontrolled public access to publishing
+                                without requiring some authentication and compensation for the Sui used.
+                            </Text>
 
-                            </Flex>
-                        </Blockquote>
-
-
-                    </Card>
-
-                    <Card>
-                        <Flex direction="column" gap="5" px="3" py="5">
-                            <Flex align="center" gap="3">
-                                <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
-                                    aggregator
-                                </Text>
-                                <TextField.Root
-                                    name="aggregator"
-                                    defaultValue={setting.aggregator}
-                                    placeholder="Enter aggregator url"
-                                    style={{width: 600}}
-                                />
-                            </Flex>
-
-                            <Flex align="center" gap="3">
-                                <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
-                                    publisher
-                                </Text>
-                                <TextField.Root
-                                    name="publisher"
-                                    defaultValue={setting.publisher}
-                                    placeholder="Enter publisher url"
-                                    style={{width: 600}}
-                                />
-                            </Flex>
                         </Flex>
-                    </Card>
+                    </Blockquote>
 
-                    <Flex justify="end">
-                        <Button type="submit">Save</Button>
+
+                </Card>
+
+                <Form onSubmit={handleSubmit}>
+                    <Flex gap="3" direction="column">
+                        <Card>
+                            <Flex direction="column" gap="5" px="3" py="5">
+                                <Flex align="center" gap="3">
+                                    <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
+                                        aggregator
+                                    </Text>
+                                    <TextField.Root
+                                        name="aggregator"
+                                        defaultValue={setting.aggregator}
+                                        placeholder="Enter aggregator url"
+                                        style={{width: 600}}
+                                        onChange={event => {
+                                            setting.aggregator = event.target.value;
+                                            setIsModify(true);
+                                        }}
+                                    />
+                                </Flex>
+
+                                <Flex align="center" gap="3">
+                                    <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
+                                        publisher
+                                    </Text>
+                                    <TextField.Root
+                                        name="publisher"
+                                        defaultValue={setting.publisher}
+                                        placeholder="Enter publisher url"
+                                        style={{width: 600}}
+                                        onChange={event => {
+                                            setting.publisher = event.target.value;
+                                            setIsModify(true);
+                                        }}
+                                    />
+                                </Flex>
+                            </Flex>
+                        </Card>
+
+                        <Flex justify="end">
+                            <Button disabled={!isModify} type="submit">Save</Button>
+                        </Flex>
                     </Flex>
+                </Form>
 
-                </Flex>
-
-            </Form>
+            </Flex>
         </>
     )
 }

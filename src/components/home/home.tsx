@@ -10,7 +10,7 @@ export default function Home() {
                     <Heading align="center">Walrus Disk</Heading>
                     <Text size="4">
                         Welcome to the Walrus Disk, a decentralized storage application that uses the Walrus protocol to
-                        store encrypted files. Walrus focuses
+                        store encrypted files. Walrus protocol focuses
                         on providing a robust but affordable solution for storing unstructured content on decentralized
                         storage nodes while ensuring high availability and reliability even in the presence of Byzantine
                         faults.

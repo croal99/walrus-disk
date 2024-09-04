@@ -45,10 +45,8 @@ export default function Layout() {
                     </Box>
                     <nav>
                         <ul>
-                            <li><Link to="/">home</Link></li>
-                            <li><Link to="/error">error</Link></li>
-                            <li><Link to="/setting">setting</Link></li>
-                            <li><Link to="/logout">sign out</Link></li>
+                            <li><Link to="/setting">Setting</Link></li>
+                            <li><Link to="/logout">Sign out</Link></li>
                         </ul>
                     </nav>
                 </Box>

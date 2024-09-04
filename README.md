@@ -1,6 +1,6 @@
 # Walrus Disk
 
-Welcome to the Walrus Disk, a decentralized storage application that uses the Walrus protocol to store encrypted files. Walrus focuses on providing a robust but affordable solution for storing unstructured content on decentralized storage nodes while ensuring high availability and reliability even in the presence of Byzantine faults.
+Welcome to the Walrus Disk, a decentralized storage application that uses the Walrus protocol to store encrypted files. Walrus protocol focuses on providing a robust but affordable solution for storing unstructured content on decentralized storage nodes while ensuring high availability and reliability even in the presence of Byzantine faults.
 
 Walrus Disk uses javascript running within your web browser to encrypt and decrypt files client-side, in-browser. This App makes no network connections during this process, to ensure that your keys never leave the web browser during the process.
 

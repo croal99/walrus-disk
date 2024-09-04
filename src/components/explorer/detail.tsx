@@ -18,15 +18,55 @@ export default function Detail({walrusFile}) {
         const setting = await getSetting();
 
         setIsDownload(true);
-        await new Promise((r) => setTimeout(r, 500)); // fake delay
-        // setIsDownload(false);
-        // return
+        // await new Promise((r) => setTimeout(r, 500)); // fake delay
 
         const txUrl = `${setting.aggregator}/v1/${walrusFile.blobId}`;
-        axios.get(txUrl, {responseType: "blob"}).then((res) => {
-            const downloadBlob = res.data as Blob
-            // const blob = new Blob([downloadBlob], {type: 'application/download'});
-            const blob = new Blob([downloadBlob], {type: walrusFile.mediaType});
+        axios.get(txUrl, { responseType: 'arraybuffer' }).then(async (res) => {
+            let cipherbytes = new Uint8Array(res.data);
+
+            let pbkdf2iterations = 10000;
+            let passphrasebytes = new TextEncoder("utf-8").encode(setting.walrusHash);
+            let pbkdf2salt = cipherbytes.slice(8, 16);
+
+            let passphrasekey = await window.crypto.subtle.importKey('raw', passphrasebytes, {name: 'PBKDF2'}, false, ['deriveBits'])
+                .catch(function (err) {
+                    console.error(err);
+                });
+
+            let pbkdf2bytes = await window.crypto.subtle.deriveBits({
+                "name": 'PBKDF2',
+                "salt": pbkdf2salt,
+                "iterations": pbkdf2iterations,
+                "hash": 'SHA-256'
+            }, passphrasekey, 384)
+                .catch(function (err) {
+                    console.error(err);
+                });
+            pbkdf2bytes = new Uint8Array(pbkdf2bytes);
+
+            let keybytes = pbkdf2bytes.slice(0, 32);
+            let ivbytes = pbkdf2bytes.slice(32);
+            cipherbytes = cipherbytes.slice(16);
+
+            let key = await window.crypto.subtle.importKey('raw', keybytes, {
+                name: 'AES-CBC',
+                length: 256
+            }, false, ['decrypt'])
+                .catch(function (err) {
+                    console.error(err);
+                });
+
+            let plaintextbytes = await window.crypto.subtle.decrypt({
+                name: "AES-CBC",
+                iv: ivbytes
+            }, key, cipherbytes)
+                .catch(function (err) {
+                    console.error(err);
+                });
+
+            plaintextbytes = new Uint8Array(plaintextbytes);
+
+            const blob = new Blob([plaintextbytes], {type: walrusFile.mediaType});
             const blobUrl = URL.createObjectURL(blob);
 
             if (!view) {

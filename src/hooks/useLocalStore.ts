@@ -12,7 +12,8 @@ export async function getSetting() {
         aggregator: "https://aggregator-devnet.walrus.space",
         publisher: "https://publisher-devnet.walrus.space",
         salt: "",
-        walrusHash: ""
+        walrusHash: "",
+        walrusSalt: "",
     }
 
     const setting: SettingOnStore | null = await localforage.getItem(KEY_SETTING);
@@ -20,8 +21,8 @@ export async function getSetting() {
         // 初始化配置
         defaultSetting.salt = Math.random().toString(36).substring(2, 12);
         defaultSetting.password = defaultSetting.salt + ':' + CryptoJS.SHA1(defaultSetting.password + defaultSetting.salt).toString();
-        // defaultSetting.walrusHash = CryptoJS.SHA1(Math.random().toString(36).substring(2, 12)).toString();
-        defaultSetting.walrusHash = 'password';
+        defaultSetting.walrusHash = Math.random().toString(36).substring(2, 12);
+        defaultSetting.walrusSalt = Math.random().toString(36).substring(2, 10);
         await setSettings(defaultSetting)
         return defaultSetting
     } else {
