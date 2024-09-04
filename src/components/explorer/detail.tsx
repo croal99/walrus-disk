@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import {FileOnStore} from "@/types/FileOnStore.ts";
 import {getSetting} from "@/hooks/useLocalStore.ts";
 import axios from "axios";
-import BlobImage from "@/components/home/blobImage.tsx";
+import BlobImage from "@/components/explorer/blobImage.tsx";
 import {humanFileSize} from "@/utils/formatSize.ts";
 
 export default function Detail({walrusFile}) {

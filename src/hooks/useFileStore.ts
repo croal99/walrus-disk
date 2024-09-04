@@ -4,6 +4,9 @@ import {FolderOnStore} from "@/types/FolderOnStore.ts";
 import {FileOnStore} from "@/types/FileOnStore.ts";
 
 const KEY_FILE = "files";
+const iconType = ["image", "pdf", "zip", "video", "audio"];
+const iconFile = ["image.png", "pdf.png", "zip.png", "video.png", "audio.png"];
+
 
 // ------ File Api ------
 
@@ -24,9 +27,46 @@ export async function getChildFiles(parentId) {
     }
 
     if (parentId) {
-        return matchSorter(files, parentId, {keys: ["parentId"]});
+        const list = matchSorter(files, parentId, {keys: ["parentId"]});
+        for (const index in list) {
+            list[index].icon = "default.png";
+            for (const key in iconType) {
+                if (list[index].mediaType.indexOf(iconType[key]) != -1) {
+                    // console.log('find', key, iconType[key]);
+                    list[index].icon = iconFile[key];
+                    break;
+                }
+            }
+        }
+
+        return list;
     }
     return [];
+}
+
+export async function getFilesByType(mediaType) {
+    const files: FileOnStore[] | null = await localforage.getItem(KEY_FILE);
+    if (!files) {
+        return []
+    }
+
+    if (mediaType.length == 0) {
+        return [];
+    }
+
+    const list = matchSorter(files, mediaType, {keys: ["mediaType"]});
+    for (const index in list) {
+        list[index].icon = "default.png";
+        for (const key in iconType) {
+            if (list[index].mediaType.indexOf(iconType[key]) != -1) {
+                // console.log('find', key, iconType[key]);
+                list[index].icon = iconFile[key];
+                break;
+            }
+        }
+    }
+
+    return list;
 }
 
 export async function checkFileIsExist(newFile: FileOnStore) {
@@ -37,9 +77,6 @@ export async function checkFileIsExist(newFile: FileOnStore) {
 }
 
 export async function createFile(newFile: FileOnStore) {
-    const iconType = ["png", "text/plain"];
-    const iconFile = ["image.png", "txt.png"];
-
     // 检查是否已经创建
     if (await checkFileIsExist(newFile)) {
         return false;
@@ -53,7 +90,7 @@ export async function createFile(newFile: FileOnStore) {
     newFile.icon = "default.png";
     for (const key in iconType) {
         if (newFile.mediaType.indexOf(iconType[key]) != -1) {
-            console.log('find', key, iconType[key]);
+            // console.log('find', key, iconType[key]);
             newFile.icon = iconFile[key];
             break;
         }

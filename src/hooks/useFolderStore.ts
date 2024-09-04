@@ -5,16 +5,16 @@ import {FileOnStore} from "@/types/FileOnStore.ts";
 
 const KEY_FOLDER = "folders";
 
+const root: FolderOnStore = {
+    id: '0',
+    name: 'root',
+    createAt: 0,
+    parentId: "",
+}
+
 // ------ Folder Api ------
 export async function getAllFolders() {
     // console.log('current folder', folderId);
-    const root: FolderOnStore = {
-        id: '0',
-        name: '/',
-        createAt: Date.now(),
-        parentId: "",
-    }
-
     const folders: FolderOnStore[] | null = await localforage.getItem(KEY_FOLDER);
     if (folders) {
         return folders
@@ -25,13 +25,6 @@ export async function getAllFolders() {
 
 export async function getCurrentFolder(folderId) {
     // console.log('current folder', folderId);
-    const root: FolderOnStore = {
-        id: '0',
-        name: '/',
-        createAt: 0,
-        parentId: "",
-    }
-
     const folders: FolderOnStore[] | null = await localforage.getItem(KEY_FOLDER);
     if (!folders) {
         return root
@@ -101,6 +94,25 @@ export async function removeFolderStore(folderInfo: FolderOnStore) {
     await setFolders(folders);
 
     return folders
+}
+
+export async function getFolderPWD(folderInfo: FolderOnStore) {
+    if (folderInfo.id === '0') {
+        return [folderInfo]
+        // return []
+    }
+
+    const pwd = [folderInfo]
+
+    const folders = await getAllFolders();
+    for (let i = 0; i < folders.length; i++) {
+        if (folders[i].id === folderInfo.parentId ) {
+            const parent = await getFolderPWD(folders[i]);
+            return parent.concat(pwd);
+        }
+    }
+
+    return pwd;
 }
 
 function setFolders(items) {
