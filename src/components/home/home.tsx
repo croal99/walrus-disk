@@ -8,14 +8,14 @@ export default function Home() {
                 <Flex direction="column" gap="3" p="9" justify="center">
                     <Heading align="center">Walrus Disk</Heading>
                     <Text size="4">
-                        Welcome to the Walrus Disk, a decentralized storage and data
-                        availability protocol designed specifically for large binary files, or "blobs". Walrus focuses
+                        Welcome to the Walrus Disk, a decentralized storage application that uses the Walrus protocol to
+                        store encrypted files. Walrus focuses
                         on providing a robust but affordable solution for storing unstructured content on decentralized
                         storage nodes while ensuring high availability and reliability even in the presence of Byzantine
                         faults.
                     </Text>
                     <Text size="4">
-                        This App uses javascript running within your web browser to encrypt and decrypt
+                        Walrus Disk uses javascript running within your web browser to encrypt and decrypt
                         files client-side, in-browser. This App makes no network connections during
                         this
                         process, to ensure that your keys never leave the web browser during
@@ -52,7 +52,8 @@ export default function Home() {
                                 Email: bc443995@gmail.com
                             </Text>
                             <Text>
-                                Donate to Sui Wallet Address: 0x6f25929f026483a440f5f16e03661087eb41604528050b989f48624b049c4b78
+                                Donate to Sui Wallet Address:
+                                0x6f25929f026483a440f5f16e03661087eb41604528050b989f48624b049c4b78
                             </Text>
 
                         </Flex>
