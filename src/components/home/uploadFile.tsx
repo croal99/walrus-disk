@@ -178,7 +178,7 @@ export default function UploadFile(
                                 </Button>
                             </Dialog.Close>
                             <Dialog.Close>
-                                <Button type="submit">Save</Button>
+                                <Button type="submit">Upload</Button>
                             </Dialog.Close>
                         </Flex>
                     </Form>

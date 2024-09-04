@@ -1,4 +1,4 @@
-import {Blockquote, Box, Button, Card, Container, Flex, Grid, Heading, Text, TextField} from "@radix-ui/themes";
+import {Blockquote, Box, Button, Card, Container, Flex, Grid, Heading, Strong, Text, TextField} from "@radix-ui/themes";
 import {Form, redirect, useLoaderData} from "react-router-dom";
 import {getSetting, setSettings} from "@/hooks/useLocalStore.ts";
 import {SettingOnStore} from "@/types/SettingOnStore.ts";
@@ -26,8 +26,38 @@ export default function Setting() {
     return (
         <>
             <Form method="post">
-                <Flex gap="3" px="4" py="4" direction="column" width="50vw">
+                <Flex gap="3" px="4" py="4" direction="column" width="650px">
                     <Heading>Setting</Heading>
+                    <Card>
+                        <Blockquote size="2">
+                            <Flex direction="column" gap="3">
+                                <Text>
+                                    The Walrus system provides an interface that can be used for public testing. For your
+                                    convenience, we provide these at the following hosts:
+                                </Text>
+                                <Text>
+                                    <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
+                                </Text>
+                                <Text>
+                                    <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
+                                </Text>
+                                <Text>
+                                    Our publisher is currently limiting requests to <Strong>10 MiB</Strong>. If you want to upload larger
+                                    files, you need to run your own publisher or use the CLI.
+                                </Text>
+
+                                <Text color="red">
+                                    Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet
+                                    deployment would likely not be able to provide uncontrolled public access to publishing
+                                    without requiring some authentication and compensation for the Sui used.
+                                </Text>
+
+                            </Flex>
+                        </Blockquote>
+
+
+                    </Card>
+
                     <Card>
                         <Flex direction="column" gap="5" px="3" py="5">
                             <Flex align="center" gap="3">
@@ -55,38 +85,10 @@ export default function Setting() {
                             </Flex>
                         </Flex>
                     </Card>
-                    <Flex justify="end" px="4">
+
+                    <Flex justify="end">
                         <Button type="submit">Save</Button>
                     </Flex>
-                    <Card>
-                        <Blockquote size="2">
-                            <Flex direction="column" gap="3">
-                                <Text>
-                                    The Walrus system provides an interface that can be used for public testing. For your
-                                    convenience, we provide these at the following hosts:
-                                </Text>
-                                <Text>
-                                    <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
-                                </Text>
-                                <Text>
-                                    <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
-                                </Text>
-                                <Text>
-                                    Our publisher is currently limiting requests to 10 MiB. If you want to upload larger
-                                    files, you need to run your own publisher or use the CLI.
-                                </Text>
-
-                                <Text color="red">
-                                    Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet
-                                    deployment would likely not be able to provide uncontrolled public access to publishing
-                                    without requiring some authentication and compensation for the Sui used.
-                                </Text>
-
-                            </Flex>
-                        </Blockquote>
-
-
-                    </Card>
 
                 </Flex>
 

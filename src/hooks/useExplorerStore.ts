@@ -84,10 +84,25 @@ export async function createFolder(newFolder: FolderOnStore) {
     newFolder.id = Math.random().toString(36).substring(2, 12);
     newFolder.createAt = Date.now();
     const folders = await getAllFolders();
-    folders.unshift(newFolder);
+    // folders.unshift(newFolder);
+    folders.push(newFolder);
     await setFolders(folders);
 
     return newFolder;
+}
+
+export async function removeFolderStore(folderInfo: FolderOnStore) {
+    const folders = await getAllFolders();
+
+    for (let i = 0; i < folders.length; i++) {
+        if (folders[i].id === folderInfo.id ) {
+            folders.splice(i, 1);
+            break;
+        }
+    }
+    await setFolders(folders);
+
+    return folders
 }
 
 function setFolders(items) {
@@ -149,10 +164,25 @@ export async function createFile(newFile: FileOnStore) {
     }
 
     const files = await getAllFiles();
-    files.unshift(newFile);
+    // files.unshift(newFile);
+    files.push(newFile);
     await setFiles(files);
 
     return newFile;
+}
+
+export async function removeFileStore(fileInfo: FileOnStore) {
+    const files = await getAllFiles();
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].id === fileInfo.id ) {
+            files.splice(i, 1);
+            break;
+        }
+    }
+    await setFiles(files);
+
+    return files
 }
 
 function setFiles(items) {

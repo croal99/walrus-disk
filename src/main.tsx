@@ -16,7 +16,7 @@ import '@radix-ui/themes/styles.css';
 import "@/styles/globals.css";
 
 import {apiAuthProvider} from "@/hooks/useAuthStatus.ts";
-import Setting, {loader as settingLoader, action as saveSettingAction} from "@/components/home/setting.tsx";
+import Setting, {loader as settingLoader, action as saveSettingAction} from "@/components/setting/setting.tsx";
 
 console.log(import.meta.env);
 
