@@ -25,7 +25,7 @@ export default function Layout() {
         <>
             <Flex>
                 <Box className="sidebar">
-                    <h1>Walrus Disk</h1>
+                    <h1><Link to="/" style={{textDecoration: 'none'}}>Walrus Disk</Link></h1>
                     <Flex>
                         <TextField.Root placeholder="Search the docs…">
                             <TextField.Slot>
@@ -37,9 +37,9 @@ export default function Layout() {
                         <nav>
                             <ul>
                                 <li><Link to="/folder/0">All files</Link></li>
-                                <li><Link to="/">Video</Link></li>
-                                <li><Link to="/">Picture</Link></li>
-                                <li><Link to="/">Document</Link></li>
+                                <li><Link to="/media/image">Picture</Link></li>
+                                <li><Link to="/media/video">Video</Link></li>
+                                <li><Link to="/media/application">Document</Link></li>
                             </ul>
                         </nav>
                     </Box>

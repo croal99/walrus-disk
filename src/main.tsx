@@ -11,6 +11,7 @@ import Layout, {loader as rootLoader} from "@/layout/layout.tsx";
 import LoginForm, {action as loginAction} from "@/components/user/LoginForm.tsx";
 import Home from "@/components/home/home.tsx";
 import Folder, {loader as folderLoader, action as folderAction} from "@/components/folder/folder.tsx";
+import Media, {loader as mediaLoader} from "@/components/media/media.tsx";
 
 import '@radix-ui/themes/styles.css';
 import "@/styles/globals.css";
@@ -30,7 +31,7 @@ const router = createBrowserRouter([
 
             children: [
                 {
-                    path: "home",
+                    // path: "home",
                     index: true,
                     Component: Home,
                 },
@@ -39,6 +40,11 @@ const router = createBrowserRouter([
                     element: <Folder/>,
                     loader: folderLoader,
                     action: folderAction,
+                },
+                {
+                    path: "media/:type",
+                    element: <Media/>,
+                    loader: mediaLoader,
                 },
                 {
                     path: "setting",

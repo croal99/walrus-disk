@@ -54,6 +54,9 @@ export async function getFilesByType(mediaType) {
         return [];
     }
 
+    // files.forEach((item)=>{
+    //     console.log(item.mediaType)
+    // });
     const list = matchSorter(files, mediaType, {keys: ["mediaType"]});
     for (const index in list) {
         list[index].icon = "default.png";

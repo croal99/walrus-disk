@@ -41,17 +41,6 @@ export default function Folder() {
 
     const {root} = useLoaderData();
 
-    const removeFolder = async (folderInfo: FolderOnStore) => {
-        await removeFolderStore(folderInfo)
-        await fetchData();
-    }
-
-    const removeFile = async (fileInfo: FileOnStore) => {
-        // console.log('remove file', fileInfo)
-        await removeFileStore(fileInfo)
-        await fetchData();
-    }
-
     const getParent = async (dir) => {
         const pwd = await getFolderPWD(dir);
         // console.log('get', dir, pwd);
@@ -68,11 +57,21 @@ export default function Folder() {
         setFileList(list);
     }
 
+    const removeFolder = async (folderInfo: FolderOnStore) => {
+        await removeFolderStore(folderInfo)
+        await fetchFolders(root.id)
+    }
+
+    const removeFile = async (fileInfo: FileOnStore) => {
+        await removeFileStore(fileInfo)
+        await fetchFiles(root.id)
+    }
+
     const fetchData = async () => {
         // console.log('fetch dir', root);
         await getParent(root);
-        await fetchFolders(root.id)
-        await fetchFiles(root.id)
+        await fetchFolders(root.id);
+        await fetchFiles(root.id);
     };
 
     useEffect(() => {
@@ -180,9 +179,10 @@ export default function Folder() {
                 </Box>
 
                 <Explorer
-                    // root={root}
                     folders={folderList}
                     files={fileList}
+                    removeFolder={removeFolder}
+                    removeFile={removeFile}
                     />
             </Box>
         </>

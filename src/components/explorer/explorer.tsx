@@ -24,44 +24,11 @@ export default function Explorer(
     {
         folders,
         files,
+        removeFolder,
+        removeFile,
     }) {
     const [fileList, setFileList] = useState<FileOnStore[]>([]);
     const [folderList, setFolderList] = useState<FolderOnStore[]>([]);
-
-    const removeFolder = async (folderInfo: FolderOnStore) => {
-        await removeFolderStore(folderInfo)
-        const list = await getChildFolders(folderInfo.parentId)
-        await setFolderList(list);
-    }
-
-    const removeFile = async (fileInfo: FileOnStore) => {
-        await removeFileStore(fileInfo)
-        const list = await getChildFiles(fileInfo.parentId)
-        await setFileList(list);
-    }
-
-    const fetchFolders = async (parentId) => {
-        const list = await getChildFolders(parentId);
-        setFolderList(list)
-    }
-
-    const fetchFiles = async (parentId) => {
-        const list = await getChildFiles(parentId)
-        setFileList(list);
-    }
-    //
-    // const fetchData = async () => {
-    //     // console.log('fetch dir', root);
-    //     await fetchFolders(root.id)
-    //     await fetchFiles(root.id)
-    // };
-    //
-    // useEffect(() => {
-    //     fetchData().then(() => {
-    //         // console.log('end fetch');
-    //     });
-    //
-    // }, [root]);
 
     useEffect(() => {
         setFolderList(folders)

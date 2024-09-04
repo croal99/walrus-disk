@@ -334,3 +334,15 @@ i {
 .login-form {
   min-width: 400px;
 }
+
+.email {
+  height: 90vh;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  border-top: 1px solid #e3e3e3;
+  order: 1;
+  line-height: 1;
+}
