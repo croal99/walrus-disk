@@ -33,7 +33,7 @@ export default function Setting() {
                             <Flex direction="column" gap="3">
                                 <Text>
                                     The Walrus system provides an interface that can be used for public testing. For your
-                                    convenience, we provide these at the following hosts:
+                                    convenience, walrus provide these at the following hosts:
                                 </Text>
                                 <Text>
                                     <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
@@ -42,8 +42,8 @@ export default function Setting() {
                                     <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
                                 </Text>
                                 <Text>
-                                    Our publisher is currently limiting requests to <Strong>10 MiB</Strong>. If you want to upload larger
-                                    files, you need to run your own publisher or use the CLI.
+                                    Walrus publisher is currently limiting requests to <Strong>10 MiB</Strong>. If you want to upload larger
+                                    files, you need to run your own publisher.
                                 </Text>
 
                                 <Text color="red">

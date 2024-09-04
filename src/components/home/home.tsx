@@ -1,5 +1,6 @@
-import {Box, Code, Flex, Heading, Section, Text} from "@radix-ui/themes";
+import {Blockquote, Box, Card, Code, Flex, Heading, Section, Strong, Text} from "@radix-ui/themes";
 import React from "react";
+import {Link} from "react-router-dom";
 
 export default function Home() {
     return (
@@ -46,18 +47,44 @@ export default function Home() {
                         import/export function to migrate your keys to the new computer. If you don't do this, all your
                         keys will be lost. Even the developer cannot recover your files.
                     </Text>
+                    <Card>
+                        <Blockquote size="2">
+                            <Flex direction="column" gap="3">
+                                <Text>
+                                    The Walrus system provides an interface that can be used for public testing. For your
+                                    convenience, walrus provide these at the following hosts:
+                                </Text>
+                                <Text>
+                                    <Text weight="bold">Aggregator:</Text> https://aggregator-devnet.walrus.space
+                                </Text>
+                                <Text>
+                                    <Text weight="bold">Publisher:</Text> https://publisher-devnet.walrus.space
+                                </Text>
+                                <Text>
+                                    Walrus publisher is currently limiting requests to <Strong>10 MiB</Strong>. If you want to upload larger
+                                    files, you need to run your own publisher.
+                                </Text>
+
+                                <Text color="red">
+                                    Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet
+                                    deployment would likely not be able to provide uncontrolled public access to publishing
+                                    without requiring some authentication and compensation for the Sui used.
+                                </Text>
+
+                            </Flex>
+                        </Blockquote>
+                    </Card>
+                    <Link to="https://docs.walrus.site/" target="_blank">Walrus docs</Link>
+                    <Link to="https://walrus.site/" target="_blank">Walrus Sites</Link>
+                    <Link to="https://docs.sui.io/" target="_blank">Sui docs</Link>
+                    <Text>
+                        Email: bc443995@gmail.com
+                    </Text>
+                    <Text>
+                        Donate to Sui Wallet Address:
+                        0x6f25929f026483a440f5f16e03661087eb41604528050b989f48624b049c4b78
+                    </Text>
                     <Box className="email">
-                        <Flex direction="column" gap="4">
-                            <Text>
-                                Email: bc443995@gmail.com
-                            </Text>
-                            <Text>
-                                Donate to Sui Wallet Address:
-                                0x6f25929f026483a440f5f16e03661087eb41604528050b989f48624b049c4b78
-                            </Text>
-
-                        </Flex>
-
                     </Box>
                 </Flex>
             </Box>
