@@ -19,7 +19,7 @@ export async function loader() {
 
 export default function Layout() {
     const {username} = useLoaderData();
-    console.log('username', username);
+    // console.log('username', username);
 
     return (
         <>

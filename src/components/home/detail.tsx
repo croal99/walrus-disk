@@ -10,9 +10,11 @@ import {humanFileSize} from "@/utils/formatSize.ts";
 export default function Detail({walrusFile}) {
     const [isDownload, setIsDownload] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
+    const [isError, setIsError] = React.useState(false);
+    const [message, setMessage] = React.useState("");
 
     const handleDownload = async (view: boolean) => {
-        console.log('download', walrusFile);
+        // console.log('download', walrusFile);
         const setting = await getSetting();
 
         setIsDownload(true);
@@ -45,11 +47,16 @@ export default function Detail({walrusFile}) {
             }
 
             setIsDownload(false);
+        }).catch(error => {
+            console.log('store error', error)
+            setMessage('Please check your network configuration and make sure the Walrus service address is correct.');
+            setIsError(true)
+            setIsDownload(false);
         })
     }
 
     useEffect(() => {
-        console.log('detail');
+        // console.log('detail');
         setIsDownload(false);
         setImageUrl("");
 
@@ -91,6 +98,31 @@ export default function Detail({walrusFile}) {
 
                 </Dialog.Content>
             </Dialog.Root>
+
+            <Dialog.Root open={isError}>
+                <Dialog.Content maxWidth="450px">
+                    <Dialog.Title>Network Error</Dialog.Title>
+                    <Dialog.Description size="2" mb="4">
+                    </Dialog.Description>
+
+                    <Flex direction="column" gap="3">
+                        <Text>
+                            {message}
+                        </Text>
+
+                        <Flex gap="3" mt="4" justify="end">
+                            <Dialog.Close>
+                                <Button onClick={() => {
+                                    setIsError(false)
+                                }}>Close</Button>
+                            </Dialog.Close>
+                        </Flex>
+
+                    </Flex>
+
+                </Dialog.Content>
+            </Dialog.Root>
+
         </>
     )
 

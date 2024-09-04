@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {getSetting} from "@/hooks/useLocalStore.ts";
 import {BlobOnWalrus, NewBlobOnWalrus} from "@/types/BlobOnWalrus.ts";
 import {FileOnStore} from "@/types/FileOnStore.ts";
-import {createFile} from "@/hooks/useExplorerStore.ts";
+import {createFile} from "@/hooks/useFileStore.ts";
 import * as Toast from '@radix-ui/react-toast';
 import axios from 'axios';
 
@@ -18,6 +18,7 @@ export default function UploadFile(
     const [file, setFile] = useState();
     const [uploadProgress, setUploadProgress] = useState(0);
     const [openToast, setOpenToast] = React.useState(false);
+    const [isError, setIsError] = React.useState(false);
     const [message, setMessage] = React.useState("");
 
     const readfile = (file) => {
@@ -33,6 +34,9 @@ export default function UploadFile(
     const handleSubmit = async (event) => {
         event.preventDefault()
         const setting = await getSetting();
+        // setMessage("error");
+        // setIsError(true);
+        // return
 
 
         const blob = await readfile(file).catch(function (err) {
@@ -130,6 +134,8 @@ export default function UploadFile(
             })
         }).catch(error => {
             console.log('store error', error)
+            setMessage('Please check your network configuration and make sure the Walrus service address is correct.');
+            setIsError(true)
         })
 
     }
@@ -207,11 +213,35 @@ export default function UploadFile(
                 </Dialog.Content>
             </Dialog.Root>
 
+            <Dialog.Root open={isError}>
+                <Dialog.Content maxWidth="450px">
+                    <Dialog.Title>Network Error</Dialog.Title>
+                    <Dialog.Description size="2" mb="4">
+                    </Dialog.Description>
+
+                    <Flex direction="column" gap="3">
+                        <Text>
+                            {message}
+                        </Text>
+
+                        <Flex gap="3" mt="4" justify="end">
+                            <Dialog.Close>
+                                <Button onClick={() => {
+                                    setIsError(false)
+                                }}>Close</Button>
+                            </Dialog.Close>
+                        </Flex>
+
+                    </Flex>
+
+                </Dialog.Content>
+            </Dialog.Root>
+
             <Toast.Provider swipeDirection="right">
                 <Toast.Root className="ToastRoot" open={openToast} onOpenChange={setOpenToast}>
                     <Toast.Title className="ToastTitle">{message}</Toast.Title>
                 </Toast.Root>
-                <Toast.Viewport className="ToastViewport" />
+                <Toast.Viewport className="ToastViewport"/>
             </Toast.Provider>
 
         </>

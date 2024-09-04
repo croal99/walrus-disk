@@ -1,13 +1,17 @@
 import React, {useEffect, useState} from "react";
 import {Form, Link, redirect, useLoaderData} from "react-router-dom";
-import {Box, Button, Card, Flex, Text, Dialog, TextField, Progress, Inset, Strong} from "@radix-ui/themes";
+import {Box, Button, Card, Flex, Text, Dialog, TextField, Table, Inset, Strong} from "@radix-ui/themes";
+import {
+    getChildFiles,
+    removeFileStore
+} from "@/hooks/useFileStore.ts";
 import {
     checkFolderIsExist,
     createFolder,
-    getChildFiles,
     getChildFolders,
-    getCurrentFolder, removeFileStore, removeFolderStore
-} from "@/hooks/useExplorerStore.ts";
+    getCurrentFolder,
+    removeFolderStore
+} from "@/hooks/useFolderStore.ts";
 import dayjs from "dayjs";
 
 import type {FolderOnStore} from "@/types/FolderOnStore.ts";
@@ -18,11 +22,8 @@ import UploadFile from "@/components/home/uploadFile.tsx";
 import {humanFileSize} from "@/utils/formatSize.ts";
 
 export async function loader({params}) {
-    console.log('get folder', params)
+    // console.log('get folder', params)
     const root = await getCurrentFolder(params.id);
-    // const folders = await getChildFolders(params.id);
-    // const files = await getChildFiles(params.id);
-    // console.log('current folder', root, folders, files);
     return {root};
 }
 
@@ -48,8 +49,8 @@ export default function Explorer() {
     }
 
     const removeFolder = async (folderInfo: FolderOnStore) => {
-        const list = await removeFolderStore(folderInfo)
-        setFolderList(list);
+        await removeFolderStore(folderInfo)
+        await fetchData();
     }
 
     const fetchFiles = async (parentId) => {
@@ -59,20 +60,19 @@ export default function Explorer() {
 
     const removeFile = async (fileInfo: FileOnStore) => {
         // console.log('remove file', fileInfo)
-        const list = await removeFileStore(fileInfo)
-        setFileList(list);
+        await removeFileStore(fileInfo)
+        await fetchData();
     }
 
     const fetchData = async () => {
-        console.log('fetch data', root);
+        // console.log('fetch dir', root);
         await fetchFolders(root.id)
         await fetchFiles(root.id)
-        // return redirect(`/folder/${root.id}`)
     };
 
     useEffect(() => {
         fetchData().then(() => {
-            console.log('end fetch');
+            // console.log('end fetch');
         });
 
     }, [root]);
@@ -80,13 +80,12 @@ export default function Explorer() {
     return (
         <>
             <Box className="explorer">
-                <Box className="explorer-nav">
-                    <Flex px="3" gap="3" className="explorer-nav-address">
-                        <Text> {root.name}</Text>
-                        <Text> &gt; </Text>
-                        <Box px="3">
-                        </Box>
+                <Flex px="3" gap="3" align="baseline">
+                    <Text> {root.name}</Text>
 
+                    <Text> &gt; </Text>
+
+                    <Flex gap="3" mt="4" justify="end" width="80vw">
                         <Dialog.Root>
                             <Dialog.Trigger>
                                 <Button onClick={
@@ -160,123 +159,140 @@ export default function Explorer() {
                             root={root}
                             reFetchDir={fetchData}
                         />
-
                     </Flex>
-                </Box>
-
-                <Flex px="3" py="3" gap="3">
-                    {folderList.map((item, index) => (
-                        <Box key={index}>
-                            <Card>
-                                <Flex gap="3">
-                                    <Inset clip="padding-box" side="left" pb="current">
-                                        <img src='/public/folder.png' alt="" style={{height: '190px'}}/>
-                                    </Inset>
-                                    <Flex direction="column" gap="3">
-                                        <Link to={"/folder/" + item.id}><Text>{item.name}</Text></Link>
-
-                                        <Dialog.Root>
-                                            <Dialog.Trigger>
-                                                <Button color="red">Delete</Button>
-                                            </Dialog.Trigger>
-
-                                            <Dialog.Content maxWidth="450px">
-                                                <Dialog.Title>Remove [{item.name}]</Dialog.Title>
-                                                <Dialog.Description size="2" mb="4">
-                                                </Dialog.Description>
-
-                                                <Flex direction="column" gap="3">
-                                                    <Text as="div" size="2" mb="1" weight="bold">
-                                                        Are you sure you want to delete the folder
-                                                        [<Strong>{item.name}</Strong>]
-                                                    </Text>
-
-                                                </Flex>
-
-                                                <Flex gap="3" mt="4" justify="end">
-                                                    <Dialog.Close>
-                                                        <Button variant="soft" color="gray">
-                                                            Cancel
-                                                        </Button>
-                                                    </Dialog.Close>
-                                                    <Dialog.Close>
-                                                        <Button color="red"
-                                                                onClick={() => removeFolder(item)}>
-                                                            Delete
-                                                        </Button>
-                                                    </Dialog.Close>
-                                                </Flex>
-                                            </Dialog.Content>
-                                        </Dialog.Root>
-
-                                    </Flex>
-                                </Flex>
-                            </Card>
-                        </Box>
-                    ))}
-                    {fileList.map((item, index) => (
-                        <Box key={index}>
-                            <Card>
-                                <Flex gap="3">
-                                    <Inset clip="padding-box" side="left" pb="current">
-                                        <img src={`/public/${item.icon}`} alt="" style={{height: '190px'}}/>
-                                    </Inset>
-                                    <Flex direction="column" gap="3">
-                                        <Text><Strong>name: </Strong>{item.name}</Text>
-                                        <Text><Strong>size: </Strong>{humanFileSize(item.size)}</Text>
-                                        <Text><Strong>create at: </Strong>{dayjs(item.createAt).format('YYYY/MM/DD')}
-                                        </Text>
-                                        <Detail
-                                            walrusFile={item}
-                                        />
-
-                                        <Dialog.Root>
-                                            <Dialog.Trigger>
-                                                <Button color="red">Delete</Button>
-                                            </Dialog.Trigger>
-
-                                            <Dialog.Content maxWidth="450px">
-                                                <Dialog.Title>Remove [{item.name}]</Dialog.Title>
-                                                <Dialog.Description size="2" mb="4">
-                                                </Dialog.Description>
-
-                                                <Flex direction="column" gap="3">
-                                                    <Text as="div" size="2" mb="1" weight="bold">
-                                                        Are you sure you want to delete the file
-                                                        [<Strong>{item.name}</Strong>]
-                                                    </Text>
-
-                                                </Flex>
-
-                                                <Flex gap="3" mt="4" justify="end">
-                                                    <Dialog.Close>
-                                                        <Button variant="soft" color="gray">
-                                                            Cancel
-                                                        </Button>
-                                                    </Dialog.Close>
-                                                    <Dialog.Close>
-                                                        <Button color="red"
-                                                                onClick={() => removeFile(item)}>
-                                                            Delete
-                                                        </Button>
-                                                    </Dialog.Close>
-                                                </Flex>
-                                            </Dialog.Content>
-                                        </Dialog.Root>
-
-                                    </Flex>
-
-                                </Flex>
-
-                            </Card>
-
-                        </Box>
-
-                    ))}
                 </Flex>
-                <Box>
-
+                <Box className="explorer-nav">
                 </Box>
+
+                <Flex px="3" py="3" gap="3" direction="column">
+                    <Card>
+                        <Table.Root>
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Create</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Size</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+
+                            <Table.Body>
+                                {folderList.map((item, index) => (
+                                    <Table.Row key={index}>
+                                        <Table.RowHeaderCell>
+                                            <Flex align="center">
+                                                <img src='/public/folder.png' alt="" style={{height: '32px'}}/>
+                                                <Link to={"/folder/" + item.id}><Text>{item.name}</Text></Link>
+                                            </Flex>
+                                        </Table.RowHeaderCell>
+                                        <Table.Cell>
+                                                {dayjs(item.createAt).format('YYYY/MM/DD')}
+                                        </Table.Cell>
+                                        <Table.Cell></Table.Cell>
+                                        <Table.Cell>
+                                            <Dialog.Root>
+                                                <Dialog.Trigger>
+                                                    <Button color="red">Delete</Button>
+                                                </Dialog.Trigger>
+
+                                                <Dialog.Content maxWidth="450px">
+                                                    <Dialog.Title>Delete Folder</Dialog.Title>
+                                                    <Dialog.Description size="2" mb="4">
+                                                    </Dialog.Description>
+
+                                                    <Flex direction="column" gap="3">
+                                                        <Text size="3" >
+                                                            Are you sure you want to delete the folder:
+                                                        </Text>
+                                                        <Text size="3" mb="1" weight="bold">
+                                                            <Strong>{item.name}</Strong>
+                                                        </Text>
+
+                                                    </Flex>
+
+                                                    <Flex gap="3" mt="4" justify="end">
+                                                        <Dialog.Close>
+                                                            <Button variant="soft" color="gray">
+                                                                Cancel
+                                                            </Button>
+                                                        </Dialog.Close>
+                                                        <Dialog.Close>
+                                                            <Button color="red"
+                                                                    onClick={() => removeFolder(item)}>
+                                                                Delete
+                                                            </Button>
+                                                        </Dialog.Close>
+                                                    </Flex>
+                                                </Dialog.Content>
+                                            </Dialog.Root>
+
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+
+                                {fileList.map((item, index) => (
+                                    <Table.Row key={index}>
+                                        <Table.RowHeaderCell>
+                                            <Flex align="center" gap="2">
+                                                <img src={`/public/${item.icon}`} alt="" style={{height: '32px'}}/>
+                                                {item.name}
+                                            </Flex>
+                                        </Table.RowHeaderCell>
+                                        <Table.Cell style={{width:250}}>{dayjs(item.createAt).format('YYYY/MM/DD HH:mm:ss')}</Table.Cell>
+                                        <Table.Cell style={{width:150}}>{humanFileSize(item.size)}</Table.Cell>
+                                        <Table.Cell style={{width:100}}>
+                                            <Flex gap="3">
+                                                <Dialog.Root>
+                                                    <Dialog.Trigger>
+                                                        <Button color="red">Delete</Button>
+                                                    </Dialog.Trigger>
+
+                                                    <Dialog.Content maxWidth="450px">
+                                                        <Dialog.Title>Delete File</Dialog.Title>
+                                                        <Dialog.Description size="2" mb="4">
+                                                        </Dialog.Description>
+
+                                                        <Flex direction="column" gap="3">
+                                                            <Text size="3" >
+                                                                Are you sure you want to delete the file:
+                                                            </Text>
+                                                            <Text size="3" mb="1" weight="bold">
+                                                                <Strong>{item.name}</Strong>
+                                                            </Text>
+
+                                                        </Flex>
+
+                                                        <Flex gap="3" mt="4" justify="end">
+                                                            <Dialog.Close>
+                                                                <Button variant="soft" color="gray">
+                                                                    Cancel
+                                                                </Button>
+                                                            </Dialog.Close>
+                                                            <Dialog.Close>
+                                                                <Button color="red"
+                                                                        onClick={() => removeFile(item)}>
+                                                                    Delete
+                                                                </Button>
+                                                            </Dialog.Close>
+                                                        </Flex>
+                                                    </Dialog.Content>
+                                                </Dialog.Root>
+
+                                                <Detail
+                                                    walrusFile={item}
+                                                />
+
+                                            </Flex>
+
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+
+                            </Table.Body>
+                        </Table.Root>
+
+                    </Card>
+                </Flex>
             </Box>
         </>
     );
