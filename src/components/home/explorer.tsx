@@ -18,12 +18,12 @@ import UploadFile from "@/components/home/uploadFile.tsx";
 import {humanFileSize} from "@/utils/formatSize.ts";
 
 export async function loader({params}) {
-    // console.log('get folder', params)
+    console.log('get folder', params)
     const root = await getCurrentFolder(params.id);
-    console.log('current folder', root);
-    const childs = await getChildFolders(params.id);
-    console.log('current child folders', childs);
-    return {root, childs};
+    const folders = await getChildFolders(params.id);
+    const files = await getChildFiles(params.id);
+    console.log('current folder', root, folders, files);
+    return {root, folders, files};
 }
 
 export async function action({request, params}) {
@@ -37,19 +37,33 @@ export async function action({request, params}) {
 
 export default function Explorer() {
     const [isFormValid, setIsFormValid] = useState(true);
+    const [currentFolder, setCurrentFolder] = useState<FolderOnStore>();
     const [fileList, setFileList] = useState<FileOnStore[]>([]);
+    const [folderList, setFolderList] = useState<FolderOnStore[]>([]);
 
-    const {root, childs} = useLoaderData();
-    // console.log('current Folders', folders);
+    const {root, folders, files} = useLoaderData();
+
+    const fetchFolders = async (parentId) => {
+        const childs = await getChildFolders(parentId);
+        console.log('current child folders', childs);
+    }
+
+    const fetchFiles = async (parentId) => {
+        const list = await getChildFiles(parentId)
+        console.log('list', list)
+        setFileList(list);
+
+    }
 
     const fetchData = async () => {
         console.log('fetch data', root);
-        const list = await getChildFiles(root.id)
-        console.log('list', list)
-        setFileList(list);
     };
 
     useEffect(() => {
+        setCurrentFolder(root);
+        setFolderList(folders);
+        setFileList(files);
+
         fetchData().then(() => {
             console.log('end fetch');
         });
@@ -138,16 +152,25 @@ export default function Explorer() {
                         <UploadFile
                             root={root}
                             reFetchDir={fetchData}
-                            />
+                        />
 
                     </Flex>
                 </Box>
 
                 <Flex px="3" py="3" gap="3">
-                    {childs.map((item, index) => (
-                        <Card key={index}>
-                            <Link to={"/folder/" + item.id}><Text>{item.name}</Text></Link>
-                        </Card>
+                    {folderList.map((item, index) => (
+                        <Box key={index}>
+                            <Card>
+                                <Flex gap="3">
+                                    <Inset clip="padding-box" side="left" pb="current">
+                                        <img src='/public/folder.png' alt="" style={{height: '190px'}}/>
+                                    </Inset>
+                                    <Card key={index}>
+                                        <Link to={"/folder/" + item.id}><Text>{item.name}</Text></Link>
+                                    </Card>
+                                </Flex>
+                            </Card>
+                        </Box>
                     ))}
                     {fileList.map((item, index) => (
                         <Box key={index}>
@@ -160,10 +183,11 @@ export default function Explorer() {
                                         <Text><Strong>name: </Strong>{item.name}</Text>
                                         <Text><Strong>type: </Strong>{item.mediaType}</Text>
                                         <Text><Strong>size: </Strong>{humanFileSize(item.size)}</Text>
-                                        <Text><Strong>create at: </Strong>{dayjs(item.createAt).format('YYYY/MM/DD')}</Text>
+                                        <Text><Strong>create at: </Strong>{dayjs(item.createAt).format('YYYY/MM/DD')}
+                                        </Text>
                                         <Detail
                                             walrusFile={item}
-                                            />
+                                        />
                                     </Flex>
 
                                 </Flex>
