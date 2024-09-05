@@ -1,20 +1,36 @@
 import {Box, Button, Card, Flex, Text, TextField} from "@radix-ui/themes";
-import {Form, redirect} from "react-router-dom";
+import {Form, redirect, useActionData} from "react-router-dom";
 import {apiAuthProvider} from "@/hooks/useAuthStatus.ts";
+import React, {useEffect} from "react";
 
 export async function action({request, params}) {
     const formData = await request.formData();
     const {username, password} = Object.fromEntries(formData);
+    const errors = {
+        message: "Wrong authentication information, the default password is [password]"
+    };
 
     // sigin
     if (await apiAuthProvider.signin(username, password)) {
         return redirect('/');
     }
 
-    return {}
+    return errors;
 }
 
 export default function LoginForm() {
+    const [message, setMessage] = React.useState("");
+
+    const errors = useActionData();
+
+    useEffect(() => {
+        if (errors?.message) {
+            setMessage(errors.message)
+        }
+
+    }, [errors]);
+
+
     return (
         <Form method="post">
             <Box className="login-container">
@@ -44,8 +60,11 @@ export default function LoginForm() {
                             />
                         </label>
                         <Button>Login</Button>
-                        <Text size="1" mb="1" align={'center'}>
-                            Version (20240824.test)
+                        <Text size="1" mb="1" color="red">
+                            {message}
+                        </Text>
+                        <Text size="1" mb="1" align="center">
+                            Version (202409.test)
                         </Text>
                     </Flex>
                 </Card>
