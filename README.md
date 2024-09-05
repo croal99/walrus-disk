@@ -31,6 +31,22 @@ Walrus publisher is currently limiting requests to 10 MiB. If you want to upload
 
 Please note that because the Walrus protocol currently uses (Testnet) Sui, the data may be updated by the publisher at any time. If you want better service, you can subscribe to the Walrus Disk+ version to get continuous update service.
 
+## File explorer
+![explorer.png](doc%2Fexplorer.png)
+
+## Upload file
+
+### Step 1: Encrypt file
+
+![ENCRYPT.png](doc%2FENCRYPT.png)
+
+### Step 2: Upload to Walrus
+
+![Upload.png](doc%2FUpload.png)
+
+## Image preview
+![preview.png](doc%2Fpreview.png)
+
 [Walrus docs](https://docs.walrus.site/)
 
 [Walrus Sites](https://walrus.site/)
