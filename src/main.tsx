@@ -18,6 +18,7 @@ import "@/styles/globals.css";
 
 import {apiAuthProvider} from "@/hooks/useAuthStatus.ts";
 import Setting, {loader as settingLoader} from "@/components/setting/setting.tsx";
+import Subscribe from "@/components/subscribe/subscribe.tsx";
 
 console.log(import.meta.env);
 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
                     path: "setting",
                     Component: Setting,
                     loader: settingLoader,
+                },
+                {
+                    path: "/subscribe",
+                    Component: Subscribe,
                 },
             ],
         },

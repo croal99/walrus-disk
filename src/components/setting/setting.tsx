@@ -35,6 +35,58 @@ export default function Setting() {
         <>
             <Flex gap="3" px="4" py="4" direction="column" width="650px">
                 <Heading>Setting</Heading>
+
+                <Card>
+                    <Flex direction="column" gap="5" px="3" py="5">
+                        <Flex align="center" gap="3">
+                            <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
+                                username
+                            </Text>
+                            <TextField.Root
+                                name="username"
+                                defaultValue={setting.username}
+                                style={{width: 600}}
+                            />
+                        </Flex>
+
+                        <Flex align="center" gap="3">
+                            <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
+                                password
+                            </Text>
+                            <TextField.Root
+                                name="password"
+                                defaultValue="password"
+                                style={{width: 600}}
+                            />
+                        </Flex>
+
+                        <Flex align="center" gap="3">
+                            <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
+                                aggregator
+                            </Text>
+                            <TextField.Root
+                                name="aggregator"
+                                defaultValue={setting.aggregator}
+                                placeholder="Enter aggregator url"
+                                style={{width: 600}}
+                            />
+                        </Flex>
+
+                        <Flex align="center" gap="3">
+                            <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
+                                publisher
+                            </Text>
+                            <TextField.Root
+                                name="publisher"
+                                defaultValue={setting.publisher}
+                                placeholder="Enter publisher url"
+                                style={{width: 600}}
+                            />
+                        </Flex>
+
+                    </Flex>
+                </Card>
+
                 <Card>
                     <Blockquote size="2">
                         <Flex direction="column" gap="3">
@@ -55,60 +107,17 @@ export default function Setting() {
                             </Text>
 
                             <Text color="red">
-                                Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet
-                                deployment would likely not be able to provide uncontrolled public access to publishing
-                                without requiring some authentication and compensation for the Sui used.
+                                Please note that because the Walrus protocol currently uses (Testnet) Sui, the data may
+                                be updated by the publisher at any time.
+                                If you want better service, you can subscribe to the author's Plus version to get
+                                continuous update service.
                             </Text>
 
+                            <Flex justify="end"><Button>subscribe</Button></Flex>
                         </Flex>
                     </Blockquote>
-
-
                 </Card>
 
-                <Form onSubmit={handleSubmit}>
-                    <Flex gap="3" direction="column">
-                        <Card>
-                            <Flex direction="column" gap="5" px="3" py="5">
-                                <Flex align="center" gap="3">
-                                    <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
-                                        aggregator
-                                    </Text>
-                                    <TextField.Root
-                                        name="aggregator"
-                                        defaultValue={setting.aggregator}
-                                        placeholder="Enter aggregator url"
-                                        style={{width: 600}}
-                                        onChange={event => {
-                                            setting.aggregator = event.target.value;
-                                            setIsModify(true);
-                                        }}
-                                    />
-                                </Flex>
-
-                                <Flex align="center" gap="3">
-                                    <Text as="div" size="2" mb="1" weight="bold" style={{width: 100}}>
-                                        publisher
-                                    </Text>
-                                    <TextField.Root
-                                        name="publisher"
-                                        defaultValue={setting.publisher}
-                                        placeholder="Enter publisher url"
-                                        style={{width: 600}}
-                                        onChange={event => {
-                                            setting.publisher = event.target.value;
-                                            setIsModify(true);
-                                        }}
-                                    />
-                                </Flex>
-                            </Flex>
-                        </Card>
-
-                        <Flex justify="end">
-                            <Button disabled={!isModify} type="submit">Save</Button>
-                        </Flex>
-                    </Flex>
-                </Form>
 
             </Flex>
         </>

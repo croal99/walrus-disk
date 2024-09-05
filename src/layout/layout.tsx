@@ -1,6 +1,6 @@
 import {Link, Outlet, redirect, useLoaderData, useRouteLoaderData} from "react-router-dom";
-import {Box, Button, Container, Flex, TextField} from "@radix-ui/themes";
-import {MagnifyingGlassIcon} from "@radix-ui/react-icons";
+import {Box, Button, Container, Flex, Text, TextField} from "@radix-ui/themes";
+import {HomeIcon, MagnifyingGlassIcon} from "@radix-ui/react-icons";
 import {apiAuthProvider} from "@/hooks/useAuthStatus.ts";
 import {getSetting} from "@/hooks/useLocalStore.ts";
 
@@ -27,15 +27,12 @@ export default function Layout() {
                 <Box className="sidebar">
                     <h1><Link to="/" style={{textDecoration: 'none'}}>Walrus Disk</Link></h1>
                     <Flex>
-                        <TextField.Root placeholder="Search the docs…">
-                            <TextField.Slot>
-                                <MagnifyingGlassIcon height="16" width="16"/>
-                            </TextField.Slot>
-                        </TextField.Root>
+                        <Text size="5">Walrus Disk</Text>
                     </Flex>
-                    <Box height="200px">
+                    <Box height="240px">
                         <nav>
                             <ul>
+                                <li><Link to="/">Home</Link></li>
                                 <li><Link to="/folder/0">All files</Link></li>
                                 <li><Link to="/media/image">Picture</Link></li>
                                 <li><Link to="/media/video">Video</Link></li>
@@ -43,11 +40,19 @@ export default function Layout() {
                             </ul>
                         </nav>
                     </Box>
+                    <Box height="120px">
+                        <nav>
+                            <ul>
+                                <li><Link to="/setting">Setting</Link></li>
+                                <li><Link to="/logout">Sign out</Link></li>
+                            </ul>
+                        </nav>
+                    </Box>
                     <nav>
                         <ul>
-                            <li><Link to="/setting">Setting</Link></li>
-                            <li><Link to="/logout">Sign out</Link></li>
+                            <li><Link to="/subscribe">Get Walrus Disk+</Link></li>
                         </ul>
+
                     </nav>
                 </Box>
 
