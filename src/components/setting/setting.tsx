@@ -1,5 +1,5 @@
 import {Blockquote, Box, Button, Card, Container, Flex, Grid, Heading, Strong, Text, TextField} from "@radix-ui/themes";
-import {Form, redirect, useLoaderData} from "react-router-dom";
+import {Form, Link, redirect, useLoaderData} from "react-router-dom";
 import {getSetting, setSettings} from "@/hooks/useLocalStore.ts";
 import {SettingOnStore} from "@/types/SettingOnStore.ts";
 import React from "react";
@@ -21,15 +21,7 @@ export async function action({request, params}) {
 
 export default function Setting() {
     const [isModify, setIsModify] = React.useState(false);
-
     const setting = useLoaderData() as SettingOnStore;
-
-    const handleSubmit = async (event) => {
-        event.preventDefault()
-        console.log('setting', setting);
-        await setSettings(setting);
-        setIsModify(false);
-    }
 
     return (
         <>
@@ -109,11 +101,11 @@ export default function Setting() {
                             <Text color="red">
                                 Please note that because the Walrus protocol currently uses (Testnet) Sui, the data may
                                 be updated by the publisher at any time.
-                                If you want better service, you can subscribe to the author's Plus version to get
+                                If you want better service, you can subscribe to the Walrus Disk+ version to get
                                 continuous update service.
                             </Text>
 
-                            <Flex justify="end"><Button>subscribe</Button></Flex>
+                            <Flex justify="end"><Link to="/subscribe"><Button>subscribe</Button></Link></Flex>
                         </Flex>
                     </Blockquote>
                 </Card>

@@ -12,13 +12,13 @@ import LoginForm, {action as loginAction} from "@/components/user/LoginForm.tsx"
 import Home from "@/components/home/home.tsx";
 import Folder, {loader as folderLoader, action as folderAction} from "@/components/folder/folder.tsx";
 import Media, {loader as mediaLoader} from "@/components/media/media.tsx";
+import Setting, {loader as settingLoader} from "@/components/setting/setting.tsx";
+import Subscribe from "@/components/subscribe/subscribe.tsx";
 
 import '@radix-ui/themes/styles.css';
 import "@/styles/globals.css";
 
 import {apiAuthProvider} from "@/hooks/useAuthStatus.ts";
-import Setting, {loader as settingLoader} from "@/components/setting/setting.tsx";
-import Subscribe from "@/components/subscribe/subscribe.tsx";
 
 console.log(import.meta.env);
 
@@ -80,7 +80,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         appearance="light"
         accentColor="grass"
     >
-        <RouterProvider router={router}/>
+                    <RouterProvider router={router}/>
 
     </Theme>
     // </React.StrictMode>

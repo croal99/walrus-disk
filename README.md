@@ -29,8 +29,8 @@ The Walrus system provides an interface that can be used for public testing. For
 
 Walrus publisher is currently limiting requests to 10 MiB. If you want to upload larger files, you need to run your own publisher.
 
-Note that the publisher consumes (Testnet) Sui on the service side, and a Mainnet deployment would likely not be able to provide uncontrolled public access to publishing without requiring some authentication and compensation for the Sui used.
- 
+Please note that because the Walrus protocol currently uses (Testnet) Sui, the data may be updated by the publisher at any time. If you want better service, you can subscribe to the Walrus Disk+ version to get continuous update service.
+
 [Walrus docs](https://docs.walrus.site/)
 
 [Walrus Sites](https://walrus.site/)

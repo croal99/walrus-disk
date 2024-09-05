@@ -6,5 +6,5 @@ export default {
         outDir:'./website',
         emptyOutDir: true,
     },
-    base: '/static-force-admin/website/',
+    base: '/',
 };

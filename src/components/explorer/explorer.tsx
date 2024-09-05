@@ -59,7 +59,7 @@ export default function Explorer(
                                 <Table.Row key={index}>
                                     <Table.RowHeaderCell>
                                         <Flex align="center">
-                                            <img src='/folder.png' alt="" style={{height: '32px'}}/>
+                                            <img src='/images/folder.png' alt="" style={{height: '32px'}}/>
                                             <Link to={"/folder/" + item.id}
                                                   style={{textDecoration: 'none'}}><Text>{item.name}</Text></Link>
                                         </Flex>
@@ -113,7 +113,7 @@ export default function Explorer(
                                 <Table.Row key={index}>
                                     <Table.RowHeaderCell>
                                         <Flex align="center" gap="2">
-                                            <img src={`/${item.icon}`} alt="" style={{height: '32px'}}/>
+                                            <img src={`/images/${item.icon}`} alt="" style={{height: '32px'}}/>
                                             {item.name}
                                         </Flex>
                                     </Table.RowHeaderCell>
